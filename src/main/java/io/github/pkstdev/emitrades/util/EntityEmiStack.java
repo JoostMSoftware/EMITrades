@@ -7,6 +7,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.DiffuseLighting;
@@ -17,14 +18,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3f;
-import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,18 +62,18 @@ public class EntityEmiStack extends EmiStack {
     }
 
     @Override
-    public boolean isEmpty() {
-        return entity == null;
-    }
-
-    @Override
-    public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+    public void render(DrawContext draw, int x, int y, float delta, int flags) {
         if (entity != null) {
             if (entity instanceof LivingEntity living)
                 renderEntity(x + 8, (int) (y + 8 + scale), scale, living);
             else
                 renderEntity((int) (x + (2 * scale / 2)), (int) (y + (2 * scale)), scale, entity);
         }
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return entity == null;
     }
 
     @Override
@@ -95,7 +94,7 @@ public class EntityEmiStack extends EmiStack {
     @Override
     public Identifier getId() {
         if (entity == null) throw new RuntimeException("Entity is null");
-        return Registry.ENTITY_TYPE.getId(entity.getType());
+        return Registries.ENTITY_TYPE.getId(entity.getType());
     }
 
     @Override
@@ -110,9 +109,9 @@ public class EntityEmiStack extends EmiStack {
             list.addAll(getTooltipText().stream().map(EmiPort::ordered).map(TooltipComponent::of).toList());
             String mod;
             if (entity instanceof VillagerEntity villager) {
-                mod = EmiUtil.getModName(Registry.VILLAGER_PROFESSION.getId(villager.getVillagerData().getProfession()).getNamespace());
+                mod = EmiUtil.getModName(Registries.VILLAGER_PROFESSION.getId(villager.getVillagerData().getProfession()).getNamespace());
             } else {
-                mod = EmiUtil.getModName(Registry.ENTITY_TYPE.getId(entity.getType()).getNamespace());
+                mod = EmiUtil.getModName(Registries.ENTITY_TYPE.getId(entity.getType()).getNamespace());
             }
             list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
             if (!getRemainder().isEmpty()) {
@@ -149,8 +148,8 @@ public class EntityEmiStack extends EmiStack {
         MatrixStack matrixStack2 = new MatrixStack();
         matrixStack2.translate(0.0, 0.0, 1000.0);
         matrixStack2.scale((float) size, (float) size, (float) size);
-        Quaternion quaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0F);
-        Quaternion quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(g * 20.0F);
+        Quaternionf quaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0F);
+        Quaternionf quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(g * 20.0F);
         quaternion.hamiltonProduct(quaternion2);
         matrixStack2.multiply(quaternion);
         float h = entity.bodyYaw;
@@ -204,8 +203,8 @@ public class EntityEmiStack extends EmiStack {
         MatrixStack matrixStack2 = new MatrixStack();
         matrixStack2.translate(0.0, 0.0, 1000.0);
         matrixStack2.scale((float) size, (float) size, (float) size);
-        Quaternion quaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0F);
-        Quaternion quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(g * 20.0F);
+        Quaternionf quaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0F);
+        Quaternionf quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(g * 20.0F);
         quaternion.hamiltonProduct(quaternion2);
         matrixStack2.multiply(quaternion);
         float i = entity.getYaw();
